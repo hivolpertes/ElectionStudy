@@ -1,10 +1,5 @@
 library(tidyverse)
 
-dat = read.delim("./5 Clean data/ElectionStudy_MergedDailyDiary_clean.txt", stringsAsFactors=F)
-
-# put into long form
-long = select(dat, SubID, NA_1:Dep_3, DayStudy.adj) %>% 
-  gather("Emotion", "value", 2:27)
 
 # Add emotion words
 long$Emotion[long$Emotion == "NA_1"] = "Afraid"
