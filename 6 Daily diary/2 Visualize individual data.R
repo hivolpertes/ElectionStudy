@@ -1,5 +1,10 @@
 library(tidyverse)
 
+dat = read.delim("./5 Clean data/ElectionStudy_MergedDailyDiary_clean.txt", stringsAsFactors=F)
+
+# put into long form
+long = select(dat, SubID, NA_1:Dep_3, DayStudy.adj) %>% 
+  gather("Emotion", "value", 2:27)
 
 # Add emotion words
 long$Emotion[long$Emotion == "NA_1"] = "Afraid"
@@ -77,7 +82,7 @@ for (i in unique(long$Emotion)) {
   ggplot(temp, aes(DayStudy.adj, value, color = SubID))+
     #geom_point() +
     geom_smooth(method="loess",se=F, alpha = .1) +
-    geom_smooth(method="loess",se=F, color = "black") +
+    geom_smooth(method="loess",se=F, color = "black", size = 5) +
     geom_vline(xintercept=0) +
     # add vertical line for Election day
     geom_vline(xintercept=7, linetype = "dashed") +
