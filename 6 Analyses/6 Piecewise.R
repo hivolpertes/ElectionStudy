@@ -491,9 +491,9 @@ TrumpVIplot =
   theme(panel.grid.minor = element_blank(),
         axis.title = element_text(size = 16),
         axis.text = element_text(size = 14),
-        strip.text = element_text(size = 16))
+        strip.text = element_text(size = 16)) 
 
-ggsave("./6 Daily diary/3 Piecewise plots/PiecewisePlot_VIsplit_Trump.jpg", TrumpVIplot, units="in", width=10, height=6)
+ggsave("./6 Analyses/3 Piecewise plots/PiecewisePlot_VIsplit_Trump.jpg", TrumpVIplot, units="in", width=10, height=6)
 
 TrumpEmoplot = 
   ggplot(long.Trump, aes(Day, value, color = VI)) +
@@ -508,11 +508,12 @@ TrumpEmoplot =
   theme(panel.grid.minor = element_blank(),
         axis.title = element_text(size = 18),
         axis.text = element_text(size = 16),
-        strip.text = element_text(size = 18))
+        strip.text = element_text(size = 18)) +
+  scale_color_manual(values=c("black", "gray60"))
 
 print(TrumpEmoplot)
 
-ggsave("./6 Daily diary/3 Piecewise plots/PiecewisePlot_Emosplit_Trump.jpg", TrumpEmoplot, units="in", width=10, height=6)
+ggsave("./6 Analyses/3 Piecewise plots/PiecewisePlot_Emosplit_Trump.jpg", TrumpEmoplot, units="in", width=10, height=6)
 
 
 
@@ -714,46 +715,58 @@ ggsave("./6 Daily diary/3 Piecewise plots/PiecewisePlot_Emosplit_Biden.jpg", Bid
 dat = left_join(dat, select(onboarding, SubID, MEIM_mean, MEIM_exp_mean, MEIM_com_mean, Nativity,
                             ICE_1, ICE_2, PHQ_sum, GAD_sum, MACVS_mean, MACVS_sup_mean, MACVS_ob_mean,
                             MACVS_ref_mean), by="SubID")
+# Nativity -----------------------------------------------------------------------------
+
+# NA
+lmer(NA_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% summary()
+
+# Anx
+lmer(Anx_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% summary()
+confint(lmer(Anx_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat))
+# Dep
+lmer(Dep_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% summary()
+
+
+# effect sizes
+# NA
+full = lmer(NA_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
+rest = lmer(NA_agg ~ 1 + B1+Nativity + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
+(full[2] - rest[2])/(1-full[2]) # using marginal R^2 (fixed+random effects)
+# Anx
+full = lmer(Anx_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
+rest = lmer(Anx_agg ~ 1 + B1+Nativity + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
+(full[2] - rest[2])/(1-full[2]) # using marginal R^2 (fixed+random effects)
+# Dep
+full = lmer(Dep_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
+rest = lmer(Dep_agg ~ 1 + B1+Nativity + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
+(full[2] - rest[2])/(1-full[2]) # using marginal R^2 (fixed+random effects)
 
 # Ethnic identity -----------------------------------------------------------------------------
 
 # NA
 lmer(NA_agg ~ 1 + B1*scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-lmer(NA_agg ~ 1 + B1*scale(MEIM_exp_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-lmer(NA_agg ~ 1 + B1*scale(MEIM_com_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-
-# PA
-lmer(PA_agg ~ 1 + B1*scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-lmer(PA_agg ~ 1 + B1*scale(MEIM_exp_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-lmer(PA_agg ~ 1 + B1*scale(MEIM_com_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
+confint(lmer(NA_agg ~ 1 + B1*scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat))
 
 # Anx
 lmer(Anx_agg ~ 1 + B1*scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-lmer(Anx_agg ~ 1 + B1*scale(MEIM_exp_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-lmer(Anx_agg ~ 1 + B1*scale(MEIM_com_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
 
 # Dep
 lmer(Dep_agg ~ 1 + B1*scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-lmer(Dep_agg ~ 1 + B1*scale(MEIM_exp_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-lmer(Dep_agg ~ 1 + B1*scale(MEIM_com_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
+confint(lmer(Dep_agg ~ 1 + B1*scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat))
 
 # effect sizes
 # NA
 full = lmer(NA_agg ~ 1 + B1*scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-rest = lmer(NA_agg ~ 1 + B1 + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-(full[1] - rest[1])/(1-full[1]) # using conditional R^2 (only fixed effects)
-# PA
-full = lmer(PA_agg ~ 1 + B1*scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-rest = lmer(PA_agg ~ 1 + B1 + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-(full[1] - rest[1])/(1-full[1]) # using conditional R^2 (only fixed effects)
+rest = lmer(NA_agg ~ 1 + B1+scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
+(full[2] - rest[2])/(1-full[2]) # using marginal R^2 (fixed+random effects)
 # Anx
 full = lmer(Anx_agg ~ 1 + B1*scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-rest = lmer(Anx_agg ~ 1 + B1 + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-(full[1] - rest[1])/(1-full[1]) # using conditional R^2 (only fixed effects)
+rest = lmer(Anx_agg ~ 1 + B1+scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
+(full[2] - rest[2])/(1-full[2]) # using marginal R^2 (fixed+random effects)
 # Dep
 full = lmer(Dep_agg ~ 1 + B1*scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-rest = lmer(Dep_agg ~ 1 + B1 + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-(full[1] - rest[1])/(1-full[1]) # using conditional R^2 (only fixed effects)
+rest = lmer(Dep_agg ~ 1 + B1+scale(MEIM_mean) + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
+(full[2] - rest[2])/(1-full[2]) # using marginal R^2 (fixed+random effects)
 
 # Ethnic identity (plot) ----------------------------------------------------------
 
@@ -827,38 +840,6 @@ print(MEIMplot)
 ggsave("./6 Daily diary/3 Piecewise plots/Stage1_Emosplit_EthID.jpg", MEIMplot, units="in", width=10, height=6)
 
 
-# Nativity -----------------------------------------------------------------------------
-
-# NA
-lmer(NA_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% summary()
-
-# PA
-lmer(PA_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% summary()
-
-# Anx
-lmer(Anx_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% summary()
-
-# Dep
-lmer(Dep_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% summary()
-
-
-# effect sizes
-# NA
-full = lmer(NA_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-rest = lmer(NA_agg ~ 1 + B1 + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-(full[1] - rest[1])/(1-full[1]) # using conditional R^2 (only fixed effects)
-# PA
-full = lmer(PA_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-rest = lmer(PA_agg ~ 1 + B1 + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-(full[1] - rest[1])/(1-full[1]) # using conditional R^2 (only fixed effects)
-# Anx
-full = lmer(Anx_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-rest = lmer(Anx_agg ~ 1 + B1 + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-(full[1] - rest[1])/(1-full[1]) # using conditional R^2 (only fixed effects)
-# Dep
-full = lmer(Dep_agg ~ 1 + B1*Nativity + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-rest = lmer(Dep_agg ~ 1 + B1 + B2 + B3 + (1|SubID), data = dat) %>% r.squaredGLMM()
-(full[1] - rest[1])/(1-full[1]) # using conditional R^2 (only fixed effects)
 
 # Familism -----------------------------------------------------------------------------
 
@@ -868,15 +849,10 @@ lmer(NA_agg ~ 1 + B1*scale(MACVS_sup_mean) + B2 + B3 + (1|SubID), data = dat) %>
 lmer(NA_agg ~ 1 + B1*scale(MACVS_ob_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
 lmer(NA_agg ~ 1 + B1*scale(MACVS_ref_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
 
-# PA
-lmer(PA_agg ~ 1 + B1*scale(MACVS_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-lmer(PA_agg ~ 1 + B1*scale(MACVS_sup_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-lmer(PA_agg ~ 1 + B1*scale(MACVS_ob_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-lmer(PA_agg ~ 1 + B1*scale(MACVS_ref_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
-
 # Anx
 lmer(Anx_agg ~ 1 + B1*scale(MACVS_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
 lmer(Anx_agg ~ 1 + B1*scale(MACVS_sup_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
+confint(lmer(Anx_agg ~ 1 + B1*scale(MACVS_sup_mean) + B2 + B3 + (1|SubID), data = dat))
 lmer(Anx_agg ~ 1 + B1*scale(MACVS_ob_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
 lmer(Anx_agg ~ 1 + B1*scale(MACVS_ref_mean) + B2 + B3 + (1|SubID), data = dat) %>% summary()
 
